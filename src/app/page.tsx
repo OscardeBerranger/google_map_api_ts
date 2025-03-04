@@ -24,7 +24,7 @@ type userLocation = {
     message: messageCoordinates;
 }
 
-const socket  = io("ws://localhost:8080");
+const socket  = io("https://websocket-server.oscadeberranger.com");
 
 socket.on('connect', () => {
     console.log("Connected");
