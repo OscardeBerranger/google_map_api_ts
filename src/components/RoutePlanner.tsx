@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from "react";
 
 interface RoutePlannerProps {
@@ -11,17 +9,14 @@ interface RoutePlannerProps {
 }
 
 const RoutePlanner = ({ origin, destination, waypoints, map, onDurationUpdate }: RoutePlannerProps) => {
-    const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
     const [renderer, setRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
 
     useEffect(() => {
         if (!origin || !destination || !map) return;
 
-        if (renderer) {
-            renderer.setMap(null);
-        }
         const directionsService = new google.maps.DirectionsService();
         const newRenderer = new google.maps.DirectionsRenderer();
+        newRenderer.setMap(map);
 
         directionsService.route(
             {
@@ -33,21 +28,22 @@ const RoutePlanner = ({ origin, destination, waypoints, map, onDurationUpdate }:
             },
             (result, status) => {
                 if (status === google.maps.DirectionsStatus.OK) {
-                    setDirections(result);
                     newRenderer.setDirections(result);
-                    newRenderer.setMap(map);
-                    setRenderer(newRenderer);
-                    const duration = result?.routes[0]?.legs.reduce((acc, leg) => acc + leg.duration?.text + " + ", "").slice(0, -3) || null;
+                    const duration = result?.routes[0].legs.reduce(
+                        (acc, leg) => acc + leg.duration?.text + " + ",
+                        ""
+                    ).slice(0, -3) || null;
+
                     onDurationUpdate(duration);
                 } else {
                     console.error("Erreur Directions API:", status);
                 }
             }
-        )
+        );
 
         return () => {
-            if (renderer) {
-                renderer.setMap(null);
+            if (newRenderer) {
+                newRenderer.setMap(null);
             }
         };
     }, [origin, destination, waypoints, map]);

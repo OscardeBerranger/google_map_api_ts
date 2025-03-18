@@ -11,6 +11,7 @@ export default function page() {
     socket.on("message", (message) => {
         setMessage("message received from " + message.id);
     })
+
     function sendMessage() {
         socket.emit("message", JSON.stringify("i'm here"));
     }
